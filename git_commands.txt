@@ -1,0 +1,8 @@
+Important Git commands:
+
+>ssh-keygen -p 								//change password
+>ssh -T git@github.com 						//test connection to GitHub
+>git remote -v								//checking remote repository URL
+
+>git remote set-url origin https://github.com/USERNAME/REPOSITORY.git	//changing from SSH to HTTPS
+>git remote set-url origin git@github.com:USERNAME/REPOSITORY.git		//changing from HTTPS to SSH
