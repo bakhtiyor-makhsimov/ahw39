@@ -2,6 +2,7 @@ package core;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.*;
+import org.openqa.selenium.support.ui.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 
@@ -10,7 +11,8 @@ public class Chrome {
 	static WebDriver driver;
 
 	public static void main(String[] args) throws InterruptedException {
-		
+
+		// Removes all Warnings from Console
 		Logger logger = Logger.getLogger("");
 		logger.setLevel(Level.OFF);
 		
@@ -34,34 +36,30 @@ public class Chrome {
 			else if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
 				option.addArguments("--start-maximized");
 			else throw new IllegalArgumentException("Unknown OS");
+			
 			driver = new ChromeDriver(option);
 			driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+			WebDriverWait wait = new WebDriverWait(driver, 15);
 		
 		driver.get(url);
-
-		Thread.sleep(1000); // Pause in milleseconds (1000 – 1 sec)
 		
+		wait.until(ExpectedConditions.titleIs("Facebook - Log In or Sign Up"));
+				
 		String title = driver.getTitle();
-		String copyright = driver.findElement(By.xpath("//*[@id=\'pageFooter\']/div[3]/div/span")).getText();
 		
-		driver.findElement(By.id("email")).sendKeys(email_address);
-		driver.findElement(By.id("pass")).sendKeys(password);
-        driver.findElement(By.id("loginbutton")).click();
-        
-        Thread.sleep(1000);
-        driver.findElement(By.xpath("//*[@id='u_0_b']/div[1]/div[1]/div/a/span")).click();
-
-        Thread.sleep(1000);
-        String friends = driver.findElement(By.xpath("//div[2]/ul/li[3]/a/span[1]")).getText();
-        
-        if (friends.length() == 0){
-        	friends = "NO";}
-                	        
-        Thread.sleep(1000);
-        driver.findElement(By.id("userNavigationLabel")).click();
-        driver.findElement(By.xpath("//span[text()='Log Out']")).click();
-      
-        Thread.sleep(1000);
+		String copyright = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\'pageFooter\']/div[3]/div/span"))).getText();
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.id("email"))).clear();
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.id("email"))).sendKeys(email_address);
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.id("pass"))).clear();
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.id("pass"))).sendKeys(password);
+		wait.until(ExpectedConditions.elementToBeClickable(By.id("loginbutton"))).click();
+		wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='u_0_b']/div[1]/div[1]/div/a/span/span"))).click();
+		String friends = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[2]/ul/li[3]/a/span[1]"))).getText();
+	    if (friends.length() == 0){
+	    	friends = "NO";}
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.id("userNavigationLabel"))).click(); 
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span[text()='Log Out']"))).click();
+		
 		driver.quit();
         
 		System.out.println("Browser is: Chrome");
