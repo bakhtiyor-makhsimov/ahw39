@@ -1,46 +1,47 @@
 package core;
 
 import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.*;
-import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
 import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 
-public class Chrome {
+public class IE {
 	
 	static WebDriver driver;
 
 	public static void main(String[] args) throws InterruptedException {
 
-		// Removes all Warnings from Console
 		Logger logger = Logger.getLogger("");
 		logger.setLevel(Level.OFF);
-		
-		
-		String driverPath = "";
+
+		String driverPath = "./resources/webdrivers/pc/IEDriverServer.exe";
 
 		String url = "http://facebook.com/";
 		String email_address = "publicbmuser@smsstam.net";
 		String password = "Buska@2017";
+		
+		if (!System.getProperty("os.name").contains("Windows")) {
+			throw new IllegalArgumentException("Internet Explorer is available only on Windows");
+			}
+			
+		DesiredCapabilities IEDesiredCapabilities = DesiredCapabilities.internetExplorer();
+		IEDesiredCapabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+		IEDesiredCapabilities.setCapability(InternetExplorerDriver.INITIAL_BROWSER_URL, "");
+		IEDesiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+		IEDesiredCapabilities.setJavascriptEnabled(true);
+		IEDesiredCapabilities.setCapability("enablePersistentHover", false);
 
-		     if (System.getProperty("os.name").toUpperCase().contains("MAC"))      driverPath = "./resources/webdrivers/mac/chromedriver";
-		else if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))  driverPath = "./resources/webdrivers/pc/chromedriver.exe";
-		else throw new IllegalArgumentException("Unknown OS");
-			
-			System.setProperty("webdriver.chrome.driver", driverPath);
-			System.setProperty("webdriver.chrome.silentOutput", "true");
-			ChromeOptions option = new ChromeOptions();
-			option.addArguments("disable-infobars"); 
-			option.addArguments("--disable-notifications");
-			if (System.getProperty("os.name").toUpperCase().contains("MAC"))
-				option.addArguments("-start-fullscreen");
-			else if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
-				option.addArguments("--start-maximized");
-			else throw new IllegalArgumentException("Unknown OS");
-			
-			driver = new ChromeDriver(option);
-			driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-			WebDriverWait wait = new WebDriverWait(driver, 15);
+		System.setProperty("webdriver.ie.driver", driverPath);
+
+		driver = new InternetExplorerDriver(IEDesiredCapabilities);
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.manage().window().maximize();
+		WebDriverWait wait = new WebDriverWait(driver, 15);
 		
 		driver.get(url);
 		
@@ -54,7 +55,7 @@ public class Chrome {
 		wait.until(ExpectedConditions.presenceOfElementLocated(By.id("pass"))).clear();
 		wait.until(ExpectedConditions.presenceOfElementLocated(By.id("pass"))).sendKeys(password);
 		wait.until(ExpectedConditions.elementToBeClickable(By.id("loginbutton"))).click();
-		wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='u_0_b']/div[1]/div[1]/div/a/span/span"))).click();
+		wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='u_0_a']/div[1]/div[1]/div/a/span/span"))).click();
 		String friends = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[2]/ul/li[3]/a/span[1]"))).getText();
 	    if (friends.length() == 0){
 	    	friends = "NO";}
